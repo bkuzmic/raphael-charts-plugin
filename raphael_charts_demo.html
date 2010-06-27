@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	
+	<title>Raphael charts plugin 0.1</title>
+	
+	<style type="text/css" media="screen">
+        body {
+            margin: 0;
+            padding: 0;            
+        }
+
+	.center {
+	    width: 80%;
+	    text-align: center;
+	    margin: 0 auto;
+	}
+       
+        .canvas {
+	    float: left;
+            height: 240px;
+            margin: 0 auto;
+            text-align: center;
+            width: 30%;
+        }
+	
+	#tooltip {
+	    position: absolute;
+	    left: -9999px;
+	    top: 0;
+	    display: none;
+	    width: 50px;
+	    border: 2px solid #000;
+	    -moz-border-radius: 4px;
+	    background-color: #fff;
+	    font-size: 10px;
+	    text-align: center;
+	    overflow: visible;
+	}
+    </style>
+
+	<script src="../jquery-1.4.2.js" type="text/javascript"></script>
+	<script src="../raphael-1.4.3.js" type="text/javascript"></script>
+	<script src="raphael-charts-0.1.js" type="text/javascript"></script>
+    
+	<script type="text/javascript">
+        $(function() {
+	    var canvasX = 320;
+	    var canvasY = 240;
+	    
+	    var paper = Raphael("canvas", canvasX, canvasY);
+	    //paper.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], {animation: true, explode: true});
+	    paper.charts.pie3d(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,10,10,10,10,4], {animation: true});	    	    
+	
+	/*
+	    var paper2 = Raphael("canvas2", canvasX, canvasY);
+	    paper2.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], {explode: true});
+
+	    var paper3 = Raphael("canvas3", canvasX, canvasY);	
+	    paper3.charts.pie3d(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,45], {animation: true});
+
+	    var paper4 = Raphael("canvas4", canvasX, canvasY);	
+	    paper4.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], {colors: ["#c00","#0c0","#00c"]});			
+	   	    
+	    var paper5 = Raphael("canvas5", canvasX, canvasY);	
+	    paper5.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], {colors: ["#cc0","#0cc","#c0c"], size3d: 30, animation: true});
+	*/
+	});
+	</script>
+</head>
+
+<body>	
+	<div class="center">
+		<h1>Raphael Charts plugin</h1>
+		<h2>3D pie demo</h2>
+		<div id="canvas" class="canvas">Normal</div>
+		<!--
+		<div id="canvas2" class="canvas">Exploded</div>
+		<div id="canvas3" class="canvas">Interactive</div>
+		<div id="canvas4" class="canvas">Custom colors</div>
+		<div id="canvas5" class="canvas">Custom 3D size</div>
+		-->
+	</div>
+	<div id="tooltip">Tooltip</div>
+</body>
+
+</html>
