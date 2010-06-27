@@ -7,10 +7,10 @@
 	<title>Raphael charts plugin 0.1</title>
 	
 	<style type="text/css" media="screen">
-        body {
-            margin: 0;
-            padding: 0;            
-        }
+    body {
+        margin: 0;
+        padding: 0;            
+    }
 
 	.center {
 	    width: 80%;
@@ -18,27 +18,31 @@
 	    margin: 0 auto;
 	}
        
-        .canvas {
-	    float: left;
-            height: 240px;
-            margin: 0 auto;
-            text-align: center;
-            width: 30%;
-        }
+    .canvas {
+ 		float: left;
+        height: 240px;
+        margin: 0 auto;
+        text-align: center;
+        width: 30%;
+    }
 	
 	#tooltip {
 	    position: absolute;
 	    left: -9999px;
 	    top: 0;
-	    display: none;
-	    width: 50px;
-	    border: 2px solid #000;
-	    -moz-border-radius: 4px;
-	    background-color: #fff;
-	    font-size: 10px;
+	    display: none;	    
+	    font-size: 11px;
 	    text-align: center;
 	    overflow: visible;
 	}
+	
+	.tooltip {		
+	    border: 2px solid #000;
+	    border-radius: 4px;
+	    -moz-border-radius: 4px;
+	    background-color: #fff;
+	}
+	
     </style>
 
 	<script src="../jquery-1.4.2.js" type="text/javascript"></script>
@@ -49,12 +53,13 @@
         $(function() {
 	    var canvasX = 320;
 	    var canvasY = 240;
+
 	    
 	    var paper = Raphael("canvas", canvasX, canvasY);
 	    //paper.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], {animation: true, explode: true});
-	    paper.charts.pie3d(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,10,10,10,10,4], {animation: true});	    	    
-	
-	/*
+	    
+	    paper.charts.pie3d(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,10,10,10,10,4], {animation: true, tooltip: true});	    	    	   
+	    /*
 	    var paper2 = Raphael("canvas2", canvasX, canvasY);
 	    paper2.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], {explode: true});
 
@@ -66,7 +71,16 @@
 	   	    
 	    var paper5 = Raphael("canvas5", canvasX, canvasY);	
 	    paper5.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], {colors: ["#cc0","#0cc","#c0c"], size3d: 30, animation: true});
-	*/
+		*/
+
+		var paper6 = Raphael("canvas6", canvasX, canvasY);
+		paper6.charts.bar3d(canvasX, canvasY, [10,20,50,40,30,15,35,20,20,14], {tooltip: true});
+
+		
+		var paper7 = Raphael("canvas7", canvasX, canvasY);
+		paper7.charts.bar3d(canvasX, canvasY, [10,20,50], 
+				{tooltip: true, labels: ["First Value","Second Value","Third Value"]});
+		/**/
 	});
 	</script>
 </head>
@@ -74,16 +88,21 @@
 <body>	
 	<div class="center">
 		<h1>Raphael Charts plugin</h1>
-		<h2>3D pie demo</h2>
-		<div id="canvas" class="canvas">Normal</div>
+		
+		<h2>3D pie demo</h2>		
+		<div id="canvas" class="canvas">Normal</div>						
 		<!--
 		<div id="canvas2" class="canvas">Exploded</div>
 		<div id="canvas3" class="canvas">Interactive</div>
 		<div id="canvas4" class="canvas">Custom colors</div>
 		<div id="canvas5" class="canvas">Custom 3D size</div>
 		-->
+		<h2>Bar 3D demo</h2>
+		<div id="canvas6" class="canvas">Bar 3d</div>		
+		<div id="canvas7" class="canvas">Bar 3d</div>
+		<!-- -->
 	</div>
-	<div id="tooltip">Tooltip</div>
+	<div id="tooltip"><span class="tooltip">Tooltip</span></div>
 </body>
 
 </html>
