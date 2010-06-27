@@ -298,6 +298,10 @@
 		    };
 		    
 		    var bar = []; // holder for interactive part of chart, in this case, front rectangle
+		    var tooltip = {
+		    	text: "",
+		    	r: ""
+		    }
 		    
 		    // calculate total and colors
 		    Raphael.getColor.reset();			    
@@ -327,11 +331,13 @@
 		    	bar[i].num = i;
 		    	
 		    	if (o.tooltip) {
-		    		 bar[i].mouseover(function() {
-						showTooltip(this.num, true);						
-					 }).mouseout(function() {
+		    		tooltip.text = paper.text(-100,-100,"");
+		    		tooltip.r = paper.rect(-100,-100,1,1);
+		    		bar[i].mouseover(function() {
+		    			showTooltip(this.num, true);						
+					}).mouseout(function() {
 						showTooltip(this.num, false);						
-					 });
+					});
 		    	}
 		    	
 		    	// draw top path
@@ -354,12 +360,26 @@
 		    }
 		    
 		    function showTooltip(num, show) {
-				var tooltip = $("#tooltip");
+				//var tooltip = $("#tooltip");
 				if (show) {
 					b = bar[num];
 					lbl = o.labels[num] ? o.labels[num] + " - " : "";
 				    lbl = lbl + o.val[num];
-				    var span = tooltip.find('span');
+				    
+				    var xt = b.attr('x') + b.attr('width')/2;
+				    var yt = b.attr('y') - o.size3d/2;
+				    
+				    tooltip.text.attr({x: xt, y: yt,'text':lbl});
+				    box = tooltip.text.getBBox();				    
+				    tooltip.r.attr({x: box.x-5, y: box.y-2, width: box.width + 10, 
+				    				height: box.height + 2, r: 4, stroke: b.attr('fill'),
+				    				"stroke-width": 2, fill: "#fff"});
+				    tooltip.r.toFront();
+				    tooltip.text.toFront();
+				    tooltip.r.show();
+				    tooltip.text.show();
+				    
+				    /*var span = tooltip.find('span');
 				    span.css({"border-color": b.attr('fill')});
 				    span.html(lbl);				    				    
 				    cur = $(paper.canvas).offset(); //-- doesn't work in opera				    
@@ -368,8 +388,10 @@
 				    var xt = cur.left + b.attr('x') + o.size3d/2 + b.attr('width')/2 - tooltip.width() / 2;				    
 				    var yt = cur.top + b.attr('y') - o.size3d/2 - tooltip.height();				    
 				    tooltip.css({left: xt + "px", top: yt + "px"}).show();
+				    */
 				} else {
-				    tooltip.hide();
+				    tooltip.text.hide();
+				    tooltip.r.hide();
 				}
 		    }
 		    
