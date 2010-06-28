@@ -2,7 +2,9 @@
 * Copyright (c) 2010 Boris Kuzmic (boris.kuzmic@gmail.com)
 * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
 
-Still alpha. Not ready for use any more. I'm planning to add complete support for tooltips, legends
+Still alpha. Not ready for use yet. 
+
+I'm planning to add complete support for tooltips, legends
 and vertical and horizontal bars (columns).
 
 Also 2d versions will come soon.
