@@ -314,16 +314,13 @@
 				colors: options.colors || [],
 				dcolors: [],
 				size3d: options.size3d || -1,
+				horizontal: options.horizontal || false,
 				tooltip: options.tooltip || false,
 				labels: options.labels || [],
 				backgroundFill: options.backgroundFill || ["#fff", "#fff"]
 		    };
 		    
 		    var bar = []; // holder for interactive part of chart, in this case, front rectangle
-		    var tooltip = {
-		    	text: "",
-		    	r: ""
-		    };
 		    
 		    // calculate total and colors
 		    Raphael.getColor.reset();			    
@@ -334,20 +331,39 @@
 		    }
 		    
 		    var padding = 5;
-		    var xs = (cx - padding*2)/ o.len;
-		    if (o.size3d == -1) o.size3d = xs / 4;		   
-		    var maxy = cy - o.size3d - padding*2;		   
-		    var x = padding;
-		    var y = 0;		   
-		    var w = xs / 1.5;		    
+		    
+		    var np = 0; // next point
+		    var maxp = 0;
+		    var x = y = w = h = 0;
+		    var grad_angle = 180;
+		    if (o.horizontal) {
+		    	grad_angle = 90;
+		    	np = (cy - padding*2) / o.len;
+		    	 if (o.size3d == -1) o.size3d = np / 4;
+		    	maxp = cx - o.size3d - padding*3;
+		    	y = padding + o.size3d;
+		    	x = padding;
+		    	h = np / 1.5;
+		    } else {
+		    	np = (cx - padding*2) / o.len;
+		    	if (o.size3d == -1) o.size3d = np / 4;
+		    	maxp = cy - o.size3d - padding*2;
+		    	x = padding;		    	
+		    	w = np / 1.5;
+		    }		    		    	    
 		    	    
 		    for (var i=0; i<o.len;i++) {
 		    	attr1 = {stroke: "#000", "stroke-width": 0.5, fill: o.colors[i]};		    	
-		    	attr2 = {stroke: "#000", "stroke-width": 0.5, fill: o.dcolors[i]};
-				attr3 = {stroke: "#000", "stroke-width": 0.5, gradient: "180-" + o.dcolors[i] + "-" + o.colors[i]};		   
+		    	attr2 = {stroke: "#000", "stroke-width": 0.5, fill: o.dcolors[i]};		    	
+				attr3 = {stroke: "#000", "stroke-width": 0.5, gradient: grad_angle + "-" + o.dcolors[i] + "-" + o.colors[i]};		   
 				
-		    	h = (maxy / o.max) * o.val[i];			    	
-		    	y = padding + maxy - h + o.size3d;		    	
+				if (o.horizontal) {
+					w = (maxp / o.max) * o.val[i];					
+				} else {
+					h = (maxp / o.max) * o.val[i];			    	
+					y = padding + maxp - h + o.size3d;
+				}
+		    	
 		    	r = paper.rect(x, y, w, h);
 		    	r.attr(attr3);
 		    	bar[i] = r;
@@ -378,7 +394,8 @@
 		    	s = paper.path(p2);
 		    	s.attr(attr2);
 		    	
-		    	x += xs;		    	
+		    	if (o.horizontal) y += np;
+		    	else x += np;		    	
 		    }
 		    
 		    function showTooltip(num, show) {				
@@ -396,8 +413,14 @@
 				    				    				    
 				    wh = findWH(tooltip);
 				    
-				    var xt = cur.left + b.attr('x') + o.size3d/2 + + b.attr('width')/2 - (wh.width/2);				    
-				    var yt = cur.top + b.attr('y') - o.size3d/2 - wh.height;				    
+				    var xt = yt = 0;
+				    if (o.horizontal) {
+				    	xt = cur.left + b.attr('x') + o.size3d/2 + b.attr('width'); // - (wh.width/2);
+				    	yt = cur.top + b.attr('y') + b.attr('height')/2 - wh.height/2;
+				    } else {
+				    	xt = cur.left + b.attr('x') + o.size3d/2 + b.attr('width')/2 - (wh.width/2);
+				    	yt = cur.top + b.attr('y') - o.size3d/2 - wh.height;				    
+				    }				    				    				    				    
 				    
 				    tooltip.style.left = xt + "px";
 				    tooltip.style.top = yt + "px";
@@ -410,20 +433,20 @@
 		    if (o.backgroundFill[0] != o.backgroundFill[1]) {
 		    	// draw grid background
 			    attrGrid = {stroke: "none", gradient: "45-" + o.backgroundFill[0] + "-" + o.backgroundFill[1]}; 
-			    p3 = ["M",1,o.size3d,"L",padding+o.size3d,1,
-			          "L",padding + o.size3d,maxy+padding,"L",1,cy-1,"z"].join(",");
+			    p3 = ["M",0,padding + o.size3d,"L",padding+o.size3d,0,
+			          "L",padding + o.size3d,cy-o.size3d-padding,"L",0,cy,"z"].join(",");
 			    var grid1 = paper.path(p3);
 			    grid1.attr(attrGrid);
 			    grid1.toBack();
 			    
-			    p3 = ["M",padding+o.size3d,1,"L",cx-1,1,
-			          "L",cx-1,maxy+padding,"L",padding+o.size3d,maxy+padding,"z"].join(",");
+			    p3 = ["M",padding+o.size3d,0,"L",cx,0,
+			          "L",cx,cy-o.size3d-padding,"L",padding+o.size3d,cy-o.size3d-padding,"z"].join(",");
 			    var grid2 = paper.path(p3);
 			    grid2.attr(attrGrid);
 			    grid2.toBack();
 			    
-			    p3 = ["M",padding+o.size3d,maxy+padding,"L",cx,maxy+padding,
-			          "L",cx-padding-o.size3d,cy-1,"L",0,cy-1,"z"].join(",");
+			    p3 = ["M",padding+o.size3d,cy-o.size3d-padding,"L",cx,cy-o.size3d-padding,
+			          "L",cx-padding-o.size3d-1,cy,"L",0,cy,"z"].join(",");
 			    var grid3 = paper.path(p3);
 			    grid3.attr(attrGrid);
 			    grid3.toBack();
