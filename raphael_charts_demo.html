@@ -56,23 +56,23 @@
 	    var canvasY = 240;	   	 
 	    
 	    var paper = Raphael("canvas", canvasX, canvasY);
-	    //paper.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], {animation: true, explode: true});	    
-	    paper.charts.pie3d(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,10,10,10,10,4], {animation: true, tooltip: true});	    	    	    
+	    //paper.charts.pie(canvasX, canvasY, 100, 50, [10,20,30], {animation: true, explode: true});	    
+	    paper.charts.pie(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,10,10,10,10,4], {animation: true, tooltip: true});	    	    	    
 
 	    
 	    var paper2 = Raphael("canvas2", canvasX, canvasY);
-	    paper2.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], {explode: true});
+	    paper2.charts.pie(canvasX, canvasY, 100, 50, [10,20,30], {explode: true});
 
 	    var paper3 = Raphael("canvas3", canvasX, canvasY);	
-	    paper3.charts.pie3d(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,45], {animation: true});
+	    paper3.charts.pie(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,45], {animation: true});
 	    
 	    var paper4 = Raphael("canvas4", canvasX, canvasY);	
-	    paper4.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], {colors: ["#c00","#0c0","#00c"]});			
+	    paper4.charts.pie(canvasX, canvasY, 100, 50, [10,20,30], {colors: ["#c00","#0c0","#00c"]});			
 
 	        
 	    var paper5 = Raphael("canvas5", canvasX, canvasY);	
-	    paper5.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], 
-	    	    {colors: ["#cc0","#0cc","#c0c"], size3d: 30, animation: true, tooltip: true,
+	    paper5.charts.pie(canvasX, canvasY, 120, 60, [20,10,30], 
+	    	    {colors: ["#cc0","#0cc","#c0c"], size3d: 30, animation: true, tooltip: true, pie3d: true,
     	    	 labels: ["Slice 1", "Slice 2", "Slice 3"],
     	    	 backgroundFill: ["#ccc", "#333"]});
 	    /**/
