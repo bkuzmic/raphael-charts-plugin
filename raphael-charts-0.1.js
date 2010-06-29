@@ -10,7 +10,8 @@
     Raphael.fn.charts = {
 	
 		pie3d : function(cx, cy, R1, R2, values, options) {
-		    var paper = this;
+		    var paper = this;		    		  		    
+		    
 		    options = options || {};
 		    var o = {
 				cx: cx / 2,
@@ -91,24 +92,26 @@
 				    
 				p1 = ["M",xa,ya,"L",o.cx, o.cy,"L",o.cx,o.cy+o.size3d,"L",xa,ya+o.size3d,"z"].join(",");
 				p2 = ["M",x,y,"L",o.cx, o.cy,"L",o.cx,o.cy+o.size3d,"L",x,y+o.size3d,"z"].join(",");
-				
+												
 				if (alpha >= 90 && alpha <= 270) {							    
 				    d = paper.path(p1);
 				    d.attr(attr1);
 				    d.toBack();			
-				    s.s1 = d;
+				    s.s1 = d;					    
 				} else {
-				    if (aTotal * o.val[i] > 90 ) {			
-						d = paper.path(p1);
-						d.attr(attr1);
-						d.toBack();			    
-						s.s2 = d;
-				    }
+					if (alpha > 180 && alpha <= 360) {		
+					    if (aTotal * (valSum - o.val[i]) < 270 ) {				    	
+							d = paper.path(p1);
+							d.attr(attr1);
+							d.toBack();							
+							s.s2 = d;						
+					    }
+					}
 				    if (alpha < 90) {			    
 						d = paper.path(p2);
 						d.attr(attr1);
-						s.s1 = d;
-				    } else {
+						s.s1 = d;						
+				    } else {				    	
 						sPart.paths.push(p2);
 						sPart.params.push(attr1);
 						sPart.indexes.push(i);			
@@ -130,7 +133,7 @@
 				    d.attr(attr2);			
 				    s.s3 = d;
 					
-				    draw3dBorder = false;				
+				    draw3dBorder = false;					    
 			    }
 				
 				p4 =["M",x,y,"A",o.R1,o.R2,"0",calculateLargeArcFlag(o.val[i], aTotal),"0",xa,ya,"L",xa,ya + o.size3d,
@@ -139,7 +142,7 @@
 				    
 				if (draw3dBorder && alpha <= 90) {		   			
 				    d = paper.path(p4);
-				    d.attr(attr2);							    
+				    d.attr(attr2);				
 				    s.s3 = d;			
 				} else if(draw3dBorder && alpha > 90) {
 				    bPart.paths.push(p4);
@@ -152,15 +155,16 @@
 				s.txm = xm;
 				s.tym = ym;
 				slices[i] = s;
+							
 		    }				
 			
 		    for (var i=sPart.paths.length-1;i>=0;i--) {		    
 				d = paper.path(sPart.paths[i]);
 				d.attr(sPart.params[i]);
-				d.toBack();
+				d.toBack();				
 				s = slices[sPart.indexes[i]];
 				s.s1 = d;
-				slices[sPart.indexes[i]] = s;
+				slices[sPart.indexes[i]] = s;			
 		    }
 			
 		    for (var i=bPart.paths.length-1;i>=0; i--) {
@@ -168,7 +172,7 @@
 				d.attr(bPart.params[i]);		
 				s = slices[bPart.indexes[i]];
 				s.s3 = d;
-				slices[bPart.indexes[i]] = s;
+				slices[bPart.indexes[i]] = s;				
 		    }
 		    
 		    // draw top slices
@@ -193,10 +197,7 @@
 				    p =["M", o.cx, o.cy, "L", x, y,"A",o.R1, o.R2,"0", calculateLargeArcFlag(o.val[i], aTotal), "0", xa, ya, "L", o.cx, o.cy, "z"].join(","); 
 				    d = paper.path(p);
 				    d.attr(attr1);
-				    //p2.toFront();
-				    d.node.setAttribute("class","slice");
-				    d.node.setAttribute("id", "slice-" + i);
-					
+				    
 				    s = slices[i];
 				    s.top = d;
 				    slices[i] = s;			
@@ -223,27 +224,36 @@
 		    }
 		    
 		    function showTooltip(num, show) {
-				var tooltip = $("#tooltip");
+				var tooltip = document.getElementById('tooltip');
 				if (show) {
 				    s = slices[num];
-				    v = Math.round((o.val[num] / o.total) * 100) + "%";				    
-				    cur = $(paper.canvas).offset(); //-- doesn't work in opera				    
-				    //cur = {left: paper.canvas.offsetLeft, top: paper.canvas.offsetTop}; // works in opera 
-				    				    
+				    v = Math.round((o.val[num] / o.total) * 100) + "%";				    				    			   
+				    
+				    cur = findPos(paper.canvas);				   
+				    
+				    // adjust values for left and top position				    
+				    cur.left = cur.left + o.cx - o.R1;
+				    cur.top = cur.top + o.cy - o.R2;	
+				    
+				    wh = findWH(tooltip);
+				    
 				    dirx = o.cx - s.txm;
 				    if (dirx < 0) pw = 0;
-				    else pw = tooltip.width() + 5;
+				    else pw = wh.width + 5;
 				    var xt = cur.left + Math.round(o.R1 - dirx) - pw;
 				    diry = o.cy - s.tym;
 				    if (diry < 0) ph = 0;
-				    else ph = tooltip.height() + 5;
+				    else ph = wh.height + 5;
 				    var yt = cur.top + Math.round(o.R2 - diry) - ph;
-				    var span = tooltip.find("span");
-				    span.css({"border-color": s.top.attr('fill')});
-				    span.html(v);
-				    tooltip.css({left: xt + "px", top: yt + "px"}).show();
+				    
+				    var span = tooltip.getElementsByTagName("span")[0];
+				    span.style.borderColor = s.top.attr('fill');
+				    span.innerHTML = v;
+				    tooltip.style.left = xt + "px";
+				    tooltip.style.top = yt + "px";
+				    tooltip.style.display = 'block';
 				} else {
-				    tooltip.hide();
+				    tooltip.style.display = 'none';
 				}
 		    }
 		    
@@ -279,8 +289,13 @@
 		    // helper functions
 		    function calculateLargeArcFlag(val, aTotal) {		
 		    	return (aTotal * val) < 180 ? 0 : 1;		
-		    }
-	
+		    }		    		   
+		    
+		    // draw background
+		    var background = paper.rect(0,0,cx,cy);	
+		    background.attr({stroke : "none", fill: "#fff"});
+		    background.toBack();
+			    
 		},
 		
 		bar3d : function(cx, cy, values, options) {
@@ -301,7 +316,7 @@
 		    var tooltip = {
 		    	text: "",
 		    	r: ""
-		    }
+		    };
 		    
 		    // calculate total and colors
 		    Raphael.getColor.reset();			    
@@ -332,7 +347,10 @@
 		    	
 		    	if (o.tooltip) {
 		    		tooltip.text = paper.text(-100,-100,"");
+		    		tooltip.text.node.style.fontSize = '12px';
+		    		tooltip.text.hide();
 		    		tooltip.r = paper.rect(-100,-100,1,1);
+		    		tooltip.r.hide();
 		    		bar[i].mouseover(function() {
 		    			showTooltip(this.num, true);						
 					}).mouseout(function() {
@@ -359,47 +377,78 @@
 		    	x += xs;		    	
 		    }
 		    
-		    function showTooltip(num, show) {
-				//var tooltip = $("#tooltip");
-				if (show) {
+		    function showTooltip(num, show) {				
+		    	var tooltip = document.getElementById('tooltip');
+		    	if (show) {
 					b = bar[num];
 					lbl = o.labels[num] ? o.labels[num] + " - " : "";
-				    lbl = lbl + o.val[num];
+				    lbl = lbl + o.val[num];				    				  
 				    
-				    var xt = b.attr('x') + b.attr('width')/2;
-				    var yt = b.attr('y') - o.size3d/2;
+				    var span = tooltip.getElementsByTagName("span")[0];
+				    span.style.borderColor = b.attr('fill');
+				    span.innerHTML = lbl;				   			    				    				    	  				     				    				  
 				    
-				    tooltip.text.attr({x: xt, y: yt,'text':lbl});
-				    box = tooltip.text.getBBox();				    
-				    tooltip.r.attr({x: box.x-5, y: box.y-2, width: box.width + 10, 
-				    				height: box.height + 2, r: 4, stroke: b.attr('fill'),
-				    				"stroke-width": 2, fill: "#fff"});
-				    tooltip.r.toFront();
-				    tooltip.text.toFront();
-				    tooltip.r.show();
-				    tooltip.text.show();
+				    cur = findPos(paper.canvas);				    				  
+				    				    				    
+				    wh = findWH(tooltip);
 				    
-				    /*var span = tooltip.find('span');
-				    span.css({"border-color": b.attr('fill')});
-				    span.html(lbl);				    				    
-				    cur = $(paper.canvas).offset(); //-- doesn't work in opera				    
-				    //cur = {left: paper.canvas.offsetLeft, top: paper.canvas.offsetTop}; // works in opera 				    				   
+				    var xt = cur.left + b.attr('x') + o.size3d/2 + + b.attr('width')/2 - (wh.width/2);				    
+				    var yt = cur.top + b.attr('y') - o.size3d/2 - wh.height;				    
 				    
-				    var xt = cur.left + b.attr('x') + o.size3d/2 + b.attr('width')/2 - tooltip.width() / 2;				    
-				    var yt = cur.top + b.attr('y') - o.size3d/2 - tooltip.height();				    
-				    tooltip.css({left: xt + "px", top: yt + "px"}).show();
-				    */
-				} else {
-				    tooltip.text.hide();
-				    tooltip.r.hide();
+				    tooltip.style.left = xt + "px";
+				    tooltip.style.top = yt + "px";
+				    tooltip.style.display = 'block';				    
+				} else {				    
+				    tooltip.style.display = 'none';
 				}
 		    }
+		    
+		    // draw background
+		    var background = paper.rect(0,0,cx,cy);	
+		    background.attr({stroke : "none", fill: "#fff"});
+		    background.toBack();
 		    
 		}
 	
     };
     
-    // helper functions
+    // ---- helper functions ----        
+    function findPos(obj) {
+    	var curleft = curtop = 0;
+    	if ( "getBoundingClientRect" in document.documentElement ) {
+    		var box = obj.getBoundingClientRect();
+    		doc = obj.ownerDocument;
+    		body = doc.body;
+    		docElem = doc.documentElement,
+			clientTop = docElem.clientTop || body.clientTop || 0;
+    		clientLeft = docElem.clientLeft || body.clientLeft || 0;
+    		curtop  = box.top  + (window.pageYOffset || docElem.scrollTop  || body.scrollTop ) - clientTop,
+    		curleft = box.left + (window.pageXOffset || docElem.scrollLeft || body.scrollLeft) - clientLeft;    		  		
+    	} else {    		
+    		if (obj.offsetParent) {
+    			do {
+    				curleft += obj.offsetLeft;
+    				curtop += obj.offsetTop;
+    			} while (obj = obj.offsetParent);    			
+    		}    		
+    	}
+    	return {left: curleft, top: curtop};
+    }
+    
+    function findWH(obj) {    	
+    	var curw = curh = 0;
+    	// reset css
+    	obj.style.display = 'block';
+    	obj.style.visibility = 'hidden';
+    	// find width and height
+    	curw = parseInt(obj.offsetWidth);
+    	curh = parseInt(obj.offsetHeight);     	
+    	// restore css
+    	obj.style.display = 'none';
+    	obj.style.visibility = '';
+    	return {width: curw, height: curh};    	
+    }             
+        
     function calculateDarkColor(color) {
 		c = Raphael.getRGB(color);
 		r = parseInt(c.r) - 66;
@@ -415,6 +464,6 @@
 		N=Math.max(0,N); N=Math.min(N,255); N=Math.round(N);
 		return "0123456789ABCDEF".charAt((N-N%16)/16)
 			+ "0123456789ABCDEF".charAt(N%16);
-    }	
+    }	       
 
 })();
