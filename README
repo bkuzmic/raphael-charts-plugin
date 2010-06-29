@@ -7,7 +7,7 @@ Still alpha. Changes alot. Not ready for use yet.
 So far:
 - added support for drawing 2d and 3d pie charts
 - added support for drawing 3d horizontal and vertical bar charts
-- works in all major browser (like RaphaelJS libarary also)
+- works in all major browsers 
 
 To be done:
 - support for legends (like tooltips - using HTML elements, not SVG)
