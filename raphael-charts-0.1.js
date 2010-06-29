@@ -6,9 +6,7 @@
  */
 
 (function () {
-    
-    Raphael.fn.charts = {
-	
+	Raphael.fn.charts = {
 		pie3d : function(cx, cy, R1, R2, values, options) {
 		    var paper = this;		    		  		    
 		    
@@ -27,7 +25,8 @@
 				animation: options.animation || false,
 				explode: options.explode || false,
 				tooltip: options.tooltip || false,
-				labels: options.labels || []
+				labels: options.labels || [],
+				backgroundFill: options.backgroundFill || ["#fff", "#fff"] 
 		    };
 		    
 		    var slices = [];
@@ -296,7 +295,11 @@
 		    
 		    // draw background
 		    var background = paper.rect(0,0,cx,cy);	
-		    background.attr({stroke : "none", fill: "#fff"});
+		    if (o.backgroundFill[0] == o.backgroundFill[1]) {
+		    	background.attr({stroke : "none", fill: o.backgroundFill[0]});
+		    } else {
+		    	background.attr({stroke : "none", gradient: "90-" + o.backgroundFill[0] + "-" + o.backgroundFill[1]});
+		    }
 		    background.toBack();
 			    
 		},
@@ -312,7 +315,8 @@
 				dcolors: [],
 				size3d: options.size3d || -1,
 				tooltip: options.tooltip || false,
-				labels: options.labels || []
+				labels: options.labels || [],
+				backgroundFill: options.backgroundFill || ["#fff", "#fff"]
 		    };
 		    
 		    var bar = []; // holder for interactive part of chart, in this case, front rectangle
@@ -329,31 +333,28 @@
 				o.dcolors[i] = calculateDarkColor(o.colors[i]);	
 		    }
 		    
-		    var xs = (cx / o.len);
-		    if (o.size3d == -1) o.size3d = xs / 4;		    
-		    var maxy = cy - o.size3d - 5;		   
-		    var x = 0;
-		    var y = 0;
+		    var padding = 5;
+		    var xs = (cx - padding*2)/ o.len;
+		    if (o.size3d == -1) o.size3d = xs / 4;		   
+		    var maxy = cy - o.size3d - padding*2;		   
+		    var x = padding;
+		    var y = 0;		   
 		    var w = xs / 1.5;		    
 		    	    
 		    for (var i=0; i<o.len;i++) {
-		    	attr1 = {stroke: "none", fill: o.colors[i]};		    	
-		    	attr2 = {stroke: "none", fill: o.dcolors[i]};
-				attr3 = {stroke: "none", gradient: "90-" + o.dcolors[i] + "-" + o.colors[i]};		   
+		    	attr1 = {stroke: "#000", "stroke-width": 0.5, fill: o.colors[i]};		    	
+		    	attr2 = {stroke: "#000", "stroke-width": 0.5, fill: o.dcolors[i]};
+				attr3 = {stroke: "#000", "stroke-width": 0.5, gradient: "180-" + o.dcolors[i] + "-" + o.colors[i]};		   
 				
 		    	h = (maxy / o.max) * o.val[i];			    	
-		    	y = maxy - h + o.size3d;		    	
+		    	y = padding + maxy - h + o.size3d;		    	
 		    	r = paper.rect(x, y, w, h);
-		    	r.attr(attr1);
+		    	r.attr(attr3);
 		    	bar[i] = r;
 		    	bar[i].num = i;
+		    	bar[i].color = o.colors[i];
 		    	
-		    	if (o.tooltip) {
-		    		tooltip.text = paper.text(-100,-100,"");
-		    		tooltip.text.node.style.fontSize = '12px';
-		    		tooltip.text.hide();
-		    		tooltip.r = paper.rect(-100,-100,1,1);
-		    		tooltip.r.hide();
+		    	if (o.tooltip) {		    		
 		    		bar[i].mouseover(function() {
 		    			showTooltip(this.num, true);						
 					}).mouseout(function() {
@@ -366,7 +367,7 @@
 		    	     "L",x + w + o.size3d, y - o.size3d,
 		    	     "L",x + w, y,"z"].join(",");		    	
 		    	t = paper.path(p1);
-		    	t.attr(attr2);
+		    	t.attr(attr1);
 		    	
 		    	
 		    	// draw side
@@ -375,7 +376,7 @@
 			    	  "L",x + w, y + h,
 			    	  "L",x + w, y,"z"].join(",");
 		    	s = paper.path(p2);
-		    	s.attr(attr3);
+		    	s.attr(attr2);
 		    	
 		    	x += xs;		    	
 		    }
@@ -388,7 +389,7 @@
 				    lbl = lbl + o.val[num];				    				  
 				    
 				    var span = tooltip.getElementsByTagName("span")[0];
-				    span.style.borderColor = b.attr('fill');
+				    span.style.borderColor = b.color;
 				    span.innerHTML = lbl;				   			    				    				    	  				     				    				  
 				    
 				    cur = findPos(paper.canvas);				    				  
@@ -405,12 +406,33 @@
 				    tooltip.style.display = 'none';
 				}
 		    }
-		    
-		    // draw background
-		    var background = paper.rect(0,0,cx,cy);	
-		    background.attr({stroke : "none", fill: "#fff"});
-		    background.toBack();
-		    
+		    		    
+		    if (o.backgroundFill[0] != o.backgroundFill[1]) {
+		    	// draw grid background
+			    attrGrid = {stroke: "none", gradient: "45-" + o.backgroundFill[0] + "-" + o.backgroundFill[1]}; 
+			    p3 = ["M",1,o.size3d,"L",padding+o.size3d,1,
+			          "L",padding + o.size3d,maxy+padding,"L",1,cy-1,"z"].join(",");
+			    var grid1 = paper.path(p3);
+			    grid1.attr(attrGrid);
+			    grid1.toBack();
+			    
+			    p3 = ["M",padding+o.size3d,1,"L",cx-1,1,
+			          "L",cx-1,maxy+padding,"L",padding+o.size3d,maxy+padding,"z"].join(",");
+			    var grid2 = paper.path(p3);
+			    grid2.attr(attrGrid);
+			    grid2.toBack();
+			    
+			    p3 = ["M",padding+o.size3d,maxy+padding,"L",cx,maxy+padding,
+			          "L",cx-padding-o.size3d,cy-1,"L",0,cy-1,"z"].join(",");
+			    var grid3 = paper.path(p3);
+			    grid3.attr(attrGrid);
+			    grid3.toBack();
+		    } else {
+		    	// draw plain background
+		    	var background = paper.rect(0,0,cx,cy);	
+		    	background.attr({stroke : "none", fill: o.backgroundFill[0]});		    
+		    	background.toBack();
+		    }		    
 		}
 	
     };

@@ -73,16 +73,19 @@
 	    var paper5 = Raphael("canvas5", canvasX, canvasY);	
 	    paper5.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], 
 	    	    {colors: ["#cc0","#0cc","#c0c"], size3d: 30, animation: true, tooltip: true,
-    	    	 labels: ["Slice 1", "Slice 2", "Slice 3"]});
+    	    	 labels: ["Slice 1", "Slice 2", "Slice 3"],
+    	    	 backgroundFill: ["#000", "#fff"]});
 	    /**/
 
 	    
 		var paper6 = Raphael("canvas6", canvasX, canvasY);
-		paper6.charts.bar3d(canvasX, canvasY, [10,20,50,40,30,15,35,20,20,14], {tooltip: true});	
+		paper6.charts.bar3d(canvasX, canvasY, [10,20,50,40,30,15,35,20,20,14], 
+				{tooltip: true, backgroundFill: ["#9bf", "#369"]});	
 		
 		var paper7 = Raphael("canvas7", canvasX, canvasY);
 		paper7.charts.bar3d(canvasX, canvasY, [10,20,50], 
-				{tooltip: true, labels: ["First Value","Second Value","Third Value is a little longer"]});
+				{tooltip: true, labels: ["First Value","Second Value","Third Value is a little longer"],
+					backgroundFill: ["#ccc", "#333"]});
 		/**/
 	};
 	</script>
