@@ -2,13 +2,15 @@
 * Copyright (c) 2010 Boris Kuzmic (boris.kuzmic@gmail.com)
 * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
 
-Still alpha. Not ready for use yet. 
+Still alpha. Changes alot. Not ready for use yet. 
 
-I'm planning to add complete support for tooltips, legends
-and vertical and horizontal bars (columns).
+So far:
+- added support for drawing 2d and 3d pie charts
+- added support for drawing 3d horizontal and vertical bar charts
+- works in all major browser (like RaphaelJS libarary also)
 
-Also 2d versions will come soon.
-
-Needs more testing - IE 6 and 7.
-
-Parallel testing in IE 8, Firefox 3.5, Chrome, Opera and Safari 4.
+To be done:
+- support for legends (like tooltips - using HTML elements, not SVG)
+- support for 2d bar charts
+- complete demo page with all possible options
+- needs more testing on IE browsers.
