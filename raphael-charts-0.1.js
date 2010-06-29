@@ -26,7 +26,8 @@
 				size3d: options.size3d || 15,
 				animation: options.animation || false,
 				explode: options.explode || false,
-				tooltip: options.tooltip || false
+				tooltip: options.tooltip || false,
+				labels: options.labels || []
 		    };
 		    
 		    var slices = [];
@@ -227,7 +228,9 @@
 				var tooltip = document.getElementById('tooltip');
 				if (show) {
 				    s = slices[num];
-				    v = Math.round((o.val[num] / o.total) * 100) + "%";				    				    			   
+				    v = Math.round((o.val[num] / o.total) * 100) + "%";	
+				    lbl = o.labels[num] ? o.labels[num] + " - " : "";
+				    lbl = lbl + v;				    
 				    
 				    cur = findPos(paper.canvas);				   
 				    
@@ -248,7 +251,7 @@
 				    
 				    var span = tooltip.getElementsByTagName("span")[0];
 				    span.style.borderColor = s.top.attr('fill');
-				    span.innerHTML = v;
+				    span.innerHTML = lbl;
 				    tooltip.style.left = xt + "px";
 				    tooltip.style.top = yt + "px";
 				    tooltip.style.display = 'block';
@@ -415,15 +418,16 @@
     // ---- helper functions ----        
     function findPos(obj) {
     	var curleft = curtop = 0;
-    	if ( "getBoundingClientRect" in document.documentElement ) {
-    		var box = obj.getBoundingClientRect();
-    		doc = obj.ownerDocument;
-    		body = doc.body;
-    		docElem = doc.documentElement,
-			clientTop = docElem.clientTop || body.clientTop || 0;
-    		clientLeft = docElem.clientLeft || body.clientLeft || 0;
+    	if ( "getBoundingClientRect" in document.documentElement && !window.opera ) {
+    		var box = obj.getBoundingClientRect();    		
+    		var doc = obj.ownerDocument;
+    		var body = doc.body;
+    		var docElem = doc.documentElement;
+			var clientTop = docElem.clientTop || body.clientTop || 0;
+    		var clientLeft = docElem.clientLeft || body.clientLeft || 0;
+    		
     		curtop  = box.top  + (window.pageYOffset || docElem.scrollTop  || body.scrollTop ) - clientTop,
-    		curleft = box.left + (window.pageXOffset || docElem.scrollLeft || body.scrollLeft) - clientLeft;    		  		
+    		curleft = box.left + (window.pageXOffset || docElem.scrollLeft || body.scrollLeft) - clientLeft;    		    	
     	} else {    		
     		if (obj.offsetParent) {
     			do {

@@ -71,7 +71,9 @@
 
 	        
 	    var paper5 = Raphael("canvas5", canvasX, canvasY);	
-	    paper5.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], {colors: ["#cc0","#0cc","#c0c"], size3d: 30, animation: true});
+	    paper5.charts.pie3d(canvasX, canvasY, 100, 50, [10,20,30], 
+	    	    {colors: ["#cc0","#0cc","#c0c"], size3d: 30, animation: true, tooltip: true,
+    	    	 labels: ["Slice 1", "Slice 2", "Slice 3"]});
 	    /**/
 
 	    
