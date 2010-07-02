@@ -49,9 +49,7 @@
 				this.indexes = [];
 			};
 			
-			calculateTotalAndUsedColors();	
-			
-			//drawSlices();
+			calculateTotalAndUsedColors();					
 	
 			var explodeFactor = 4;						
 	
@@ -63,9 +61,7 @@
 			var draw3dBorder = true;
 			var bPart = new slicePart();
 			var sPart = new slicePart();
-			var topPart = new slicePart();
-			
-			//drawSides();
+			var topPart = new slicePart();					
 			
 			// first point in drawing slice
 			var x = o.cx + o.R1;
@@ -88,9 +84,10 @@
 					s.s3 = createPart(p, borderParams);
 				}					
 				slices[0] = s;
-			} else {
-				
-				for ( var i = 0; i < o.numberOfValues; i++) {					
+			} else {				
+				for ( var i = 0; i < o.numberOfValues; i++) {
+					s = new slice();
+					
 					sideParams = {stroke : "none", fill : o.darkColors[i]};
 					borderParams = {stroke : "none", gradient : "90-" + o.darkColors[i] + "-" + o.colors[i]};
 					topParams = {stroke : "#ccc", fill : o.colors[i]}; 
@@ -100,6 +97,9 @@
 		
 					valSum += o.val[i];
 					alpha = aTotal * valSum;
+					
+					var largeAngleFlag = calculateLargeArcFlag(o.val[i], aTotal);
+					
 					x = o.cx + o.R1 * Math.cos(alpha * rad);
 					y = o.cy + o.R2 * Math.sin(alpha * rad);
 		
@@ -109,9 +109,12 @@
 					y4 = o.cy + (o.R2 / explodeFactor) * Math.sin(alphaM * rad);				
 					xm = o.cx + o.R1 * Math.cos(alphaM * rad);
 					ym = o.cy + o.R2 * Math.sin(alphaM * rad);
-		
-					s = new slice();
-		
+					
+					s.tx = x4;
+					s.ty = y4;
+					s.txm = xm;
+					s.tym = ym;
+									
 					if (o.show3d) {
 						topParams.stroke = "none";
 						
@@ -135,14 +138,14 @@
 							}
 						}
 						
-						// draw 3d part only up to 180 deegrees and only once
+						// draw 3d border parts only up to 180 deegrees										
 						if (alpha >= 180 && draw3dBorder) {										
 							p3 = createPathForBorderPart(o.cx - o.R1, o.cy, xa, ya, 0);												
 							s.s3 = createPart(p3, borderParams);	
 							draw3dBorder = false;
 						}
 						
-						p4 = createPathForBorderPart(x, y, xa, ya, calculateLargeArcFlag(o.val[i], aTotal));
+						p4 = createPathForBorderPart(x, y, xa, ya, largeAngleFlag);
 		
 						if (draw3dBorder && alpha <= 90) {						
 							s.s3 = createPart(p4, borderParams);
@@ -152,40 +155,32 @@
 							bPart.indexes.push(i);
 						}
 					}
-									
-					topPath = createPathForTopPart(x, y, xa, ya, calculateLargeArcFlag(o.val[i], aTotal));
+					
+					// create and prepare top parts, but draw later
+					topPath = createPathForTopPart(x, y, xa, ya,largeAngleFlag);
 					topPart.paths.push(topPath);
 					topPart.params.push(topParams);
 					topPart.indexes.push(i);							
-		
-					s.tx = x4;
-					s.ty = y4;
-					s.txm = xm;
-					s.tym = ym;
+							
 					slices[i] = s;
 				}
-			}
 				
-			drawSlicePart(sPart, "side1");
-			drawSlicePart(bPart, "side3");
-			drawSlicePart(topPart, "top");
+				drawSlicePart(sPart, "s1");
+				drawSlicePart(bPart, "s3");
+				drawSlicePart(topPart, "top");
+			}						
 							
 			function drawSlicePart(slicePart, side) {
-				for ( var i = slicePart.paths.length - 1; i >= 0; i--) {
-					var drawSlice = paper.path(slicePart.paths[i]);
-					drawSlice.attr(slicePart.params[i]);				
+				for ( var i = slicePart.paths.length - 1; i >= 0; i--) {													
 					s = slices[slicePart.indexes[i]];
-					if (side == "side1") {
-						drawSlice.toBack();
-						s.s1 = drawSlice;
-					} else if (side == "side3") {
-						s.s3 = drawSlice;
-					} else if (side == "top") {
-						s.top = drawSlice;
-					}								
+					if (side == "s1") {
+						s[side] = createPartAndSendToBack(slicePart.paths[i], slicePart.params[i]);
+					} else {
+						s[side] = createPart(slicePart.paths[i], slicePart.params[i]);
+					}															
 					slices[slicePart.indexes[i]] = s;
 				}
-			}
+			}						
 			
 			function createPathFromPoint(startX, startY) {
 				return ["M", startX, startY, 
@@ -230,16 +225,18 @@
 			background.attr(backgroundParams);			
 			background.toBack();
 	
-			if (o.animation && o.numberOfValues>1) {
+			if (o.animation && o.numberOfValues > 1) {
 				for ( var i = 0; i < o.numberOfValues; i++) {
 					slices[i].top.num = i;
 					slices[i].top.mouseover(function() {
 						if (o.tooltip)
 							showTooltip(this.num, true);
+						highlightOn(slices[this.num]);
 						animateSliceOut(slices[this.num], 1000);
 					}).mouseout(function() {
 						if (o.tooltip)
 							showTooltip(this.num, false);
+						highlightOff(slices[this.num]);
 						animateSliceIn(slices[this.num], 500);
 					});
 				}
@@ -290,73 +287,46 @@
 					tooltip.style.display = 'none';
 				}
 			}
-	
-			function animateSliceOut(s, speed) {
+			
+			function highlightOn(s) {
 				s.top.attr("fill", o.lightColors[s.top.num]);
-				if (o.show3d) {
-					s.s1.animate( {
-						translation : "" + (s.tx - o.cx) + "," + (s.ty - o.cy)
-					}, speed);
-					if (s.s2)
-						s.s2.animateWith(s.s1, {
-							translation : "" + (s.tx - o.cx) + ","
-							+ (s.ty - o.cy)
-						}, speed);
-					if (s.s3) {
-						s.s3.animateWith(s.s1, {
-							translation : "" + (s.tx - o.cx) + ","
-							+ (s.ty - o.cy)
-						}, speed);
-					}					
-					s.top.animateWith(s.s1, {
-						translation : "" + (s.tx - o.cx) + "," + (s.ty - o.cy)
-					}, speed);
-				} else {					
-					s.top.animate( {
-						translation : "" + (s.tx - o.cx) + "," + (s.ty - o.cy)
-					}, speed);
-				}
-	
+			}
+			
+			function highlightOff(s) {
+				s.top.attr("fill", o.colors[s.top.num]);
 			}
 	
-			function animateSliceIn(s, speed) {
-				s.top.attr("fill", o.colors[s.top.num]);
-				if (o.show3d) {
-					s.s1.stop();
-					cord = s.s1.attr("translation");
-					s.s1.animate( {
-						translation : "" + (-cord.x) + "," + (-cord.y)
-					}, speed);
-					if (s.s2)
-						s.s2.animateWith(s.s1, {
-							translation : "" + (-cord.x) + "," + (-cord.y)
-						}, speed);
-					if (s.s3) {
-						s.s3.animateWith(s.s1, {
-							translation : "" + (-cord.x) + "," + (-cord.y)
-						}, speed);
-					}					
-					s.top.animateWith(s.s1, {
-						translation : "" + (-cord.x) + "," + (-cord.y)
-					}, speed);
-				} else {
-					s.top.stop();
-					cord = s.top.attr("translation");					
-					s.top.animate( {
-						translation : "" + (-cord.x) + "," + (-cord.y)
-					}, speed);
-				}
+			function animateSliceOut(s, speed) {
+				var translateX = s.tx - o.cx;
+				var translateY = s.ty - o.cy;	
+				animateSlice(s, translateX, translateY, speed);					
+			}
 	
+			function animateSliceIn(s, speed) {		
+				var animatePart = s.s1 || s.top;
+				animatePart.stop();
+				var cord = animatePart.attr("translation");				
+				animateSlice(s, -cord.x, -cord.y, speed);
+			}
+			
+			function animateSlice(s, xcord, ycord, speed) {								
+				if (s.s1) {
+					s.s1.animate({translation : "" + xcord + "," + ycord}, speed);
+					(s.s2) ? s.s2.animateWith(s.s1, {translation : "" + xcord + "," + ycord}, speed) : false;
+					(s.s3) ? s.s3.animateWith(s.s1, {translation : "" + xcord + "," + ycord}, speed) : false;
+					s.top.animateWith(s.s1, {translation : "" + xcord + "," + ycord}, speed);
+				} else {
+					s.top.animate({translation : "" + xcord + "," + ycord}, speed);
+				}
 			}
 	
 			function explodeSlice(s) {
-				if (s.s1)
-					s.s1.translate(s.tx - o.cx, s.ty - o.cy);
-				if (s.s2)
-					s.s2.translate(s.tx - o.cx, s.ty - o.cy);
-				if (s.s3)
-					s.s3.translate(s.tx - o.cx, s.ty - o.cy);
-				s.top.translate(s.tx - o.cx, s.ty - o.cy);
+				var translateX = s.tx - o.cx;
+				var translateY = s.ty - o.cy;
+				(s.s1) ? s.s1.translate(translateX, translateY) : false;
+				(s.s2) ? s.s2.translate(translateX, translateY) : false;
+				(s.s3) ? s.s3.translate(translateX, translateY) : false;
+				s.top.translate(translateX, translateY);
 			}
 				
 			function calculateLargeArcFlag(value, total) {

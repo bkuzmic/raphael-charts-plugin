@@ -56,9 +56,12 @@
 	    var canvasY = 240;	   	 
 	    
 	    var paper = Raphael("canvas", canvasX, canvasY);
-	    //paper.charts.pie(canvasX, canvasY, 100, 50, [10,20,30], {animation: true, explode: true});	    
+	    	 
+	    var startTime = new Date().getTime();   
 	    paper.charts.pie(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,10,10,10,10,4], 
-	    	    {animation: true, tooltip: true, show3d: true});	    	    	    
+	    	    {animation: true, tooltip: true, show3d: true});
+	    var endTime = new Date().getTime();
+	    console.log("Time: " + (endTime - startTime));	    	    	    
 
 	    
 	    var paper2 = Raphael("canvas2", canvasX, canvasY);
@@ -72,7 +75,7 @@
 
 	        
 	    var paper5 = Raphael("canvas5", canvasX, canvasY);	
-	    paper5.charts.pie(canvasX, canvasY, 120, 60, [20], 
+	    paper5.charts.pie(canvasX, canvasY, 120, 60, [20,10,30], 
 	    	    {colors: ["#cc0","#0cc","#c0c"], size3d: 30, animation: true, tooltip: true, show3d: true,
     	    	 labels: ["Slice 1", "Slice 2", "Slice 3"],
     	    	 backgroundFill: ["#ccc", "#333"]});
