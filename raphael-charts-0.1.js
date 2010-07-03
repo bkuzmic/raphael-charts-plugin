@@ -1,5 +1,5 @@
 /*
- * Raphael Charts plugin - version 0.2
+ * Raphael Charts plugin - version 0.1
  * Copyright (c) 2010 Boris Kuzmic (boris.kuzmic@gmail.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  * 
@@ -587,9 +587,9 @@
 
 	function calculateDarkColor(color) {
 		var c = Raphael.getRGB(color);
-		var r = parseInt(c.r) - 66;
-		var g = parseInt(c.g) - 60;
-		var b = parseInt(c.b) - 54;
+		var r = parseInt(c.r) - 36;
+		var g = parseInt(c.g) - 30;
+		var b = parseInt(c.b) - 24;
 		return "#" + toHex(r) + toHex(g) + toHex(b);		
 	}
 	
