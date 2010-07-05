@@ -89,7 +89,7 @@
 					
 					sideParams = {stroke : "none", fill : o.darkColors[i]};
 					borderParams = {stroke : "none", gradient : "90-" + o.darkColors[i] + "-" + o.colors[i]};
-					topParams = {stroke : "#ccc", fill : o.colors[i]}; 
+					topParams = {stroke : "#ccc", gradient : "180-" + o.darkColors[i] + "-" + o.lightColors[i]}; //fill : o.colors[i] 
 		
 					var endX = x;
 					var endY = y;
@@ -273,7 +273,7 @@
 					var yt = cur.top + Math.round(o.R2 - diry) - ph;
 	
 					var span = tooltip.getElementsByTagName("span")[0];
-					span.style.borderColor = s.top.attr('fill');
+					span.style.borderColor = o.colors[num];
 					span.innerHTML = lbl;
 					tooltip.style.left = xt + "px";
 					tooltip.style.top = yt + "px";
@@ -284,11 +284,13 @@
 			}
 			
 			function highlightOn(s) {
-				s.top.attr("fill", o.lightColors[s.top.num]);
+				//s.top.attr("fill", o.lightColors[s.top.num]);
+				s.top.attr("gradient", "90-" + o.lightColors[s.top.num] + "-" + o.colors[s.top.num]);
 			}
 			
 			function highlightOff(s) {
-				s.top.attr("fill", o.colors[s.top.num]);
+				//s.top.attr("fill", o.colors[s.top.num]);
+				s.top.attr("gradient", "180-" + o.darkColors[s.top.num] + "-" + o.lightColors[s.top.num]);
 			}
 	
 			function animateSliceOut(s, speed) {
