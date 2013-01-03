@@ -21,7 +21,7 @@
     .canvas {
  		float: left;
         height: 240px;
-        margin: 0 auto;
+        margin: 0 auto 25px auto;
         text-align: center;
         width: 30%;
     }
@@ -48,7 +48,7 @@
 	
     </style>    
 	
- 	<script src="../raphael-1.4.3.js" type="text/javascript"></script>
+ 	<script src="raphael-min-2.1.0.js" type="text/javascript"></script>
 	<script src="raphael-charts-0.1.js" type="text/javascript"></script>
     
 	<script type="text/javascript">
@@ -59,38 +59,43 @@
 	    var paper = Raphael("canvas", canvasX, canvasY);
 	    	 
 	    var startTime = new Date().getTime();   
-	    paper.charts.pie(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,10,10,10,10,4], 
+	    paper.pie(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,10,10,10,10,4], 
 	    	    {animation: true, tooltip: true, show3d: true});
 	    var endTime = new Date().getTime();
 	    //console.log("Time: " + (endTime - startTime));	    	    	    
 
 	    
 	    var paper2 = Raphael("canvas2", canvasX, canvasY);
-	    paper2.charts.pie(canvasX, canvasY, 100, 50, [10,20,30], {explode: true});
+	    paper2.pie(canvasX, canvasY, 100, 50, [10,20,30], {explode: true});
 
 	    var paper3 = Raphael("canvas3", canvasX, canvasY);	
-	    paper3.charts.pie(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,45], {animation: true});
+	    paper3.pie(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,45], {animation: true});
 	    
 	    var paper4 = Raphael("canvas4", canvasX, canvasY);	
-	    paper4.charts.pie(canvasX, canvasY, 100, 50, [10,20,30], {colors: ["#c00","#0c0","#00c"]});			
+	    paper4.pie(canvasX, canvasY, 100, 50, [10,20,30], {colors: ["#c00","#0c0","#00c"]});			
 
 	        
 	    var paper5 = Raphael("canvas5", canvasX, canvasY);	
-	    paper5.charts.pie(canvasX, canvasY, 120, 60, [20,10,30], 
-	    	    {colors: ["#cc0","#0cc","#369"], size3d: 15, animation: true, tooltip: true, show3d: true,
+	    paper5.pie(canvasX, canvasY, 120, 60, [20,10,30], 
+	    	    {colors: ["#cc0","#0cc","#369"], size3d: 30, animation: true, tooltip: true, show3d: true,
     	    	 labels: ["Slice 1", "Slice 2", "Slice 3"],
     	    	 backgroundFill: ["#ccc", "#333"]});
 	    /**/
 
 	    
 		var paper6 = Raphael("canvas6", canvasX, canvasY);
-		paper6.charts.bar3d(canvasX, canvasY, [10,20,50,40,30,15,35,20,20,14], 
-				{tooltip: true, backgroundFill: ["#9bf", "#369"]});	
+		paper6.bar(canvasX, canvasY, [10,20,50,40,30,15,35,20,20,14], 
+				{tooltip: true, backgroundFill: ["#9bf", "#369"], show3d: true});	
 		
 		var paper7 = Raphael("canvas7", canvasX, canvasY);
-		paper7.charts.bar3d(250, 150, [10,20,50,40], 
+		paper7.bar(250, 150, [10,20,50,40], 
 				{tooltip: true, labels: ["First Value","Second Value","Third Value is a little longer"],
-					backgroundFill: ["#ccc", "#333"], horizontal: true});
+					backgroundFill: ["#ccc", "#333"], horizontal: true, show3d: true});
+
+		var paper8 = Raphael("canvas8", canvasX, canvasY);
+        paper8.bar(250, 150, [10,20,50,40],
+                       {tooltip: true, labels: ["First Value","Second Value","Third Value is a little longer"],
+                        backgroundFill: ["#ccc", "#ccc"], horizontal: true});
 		/**/
 	};
 	</script>
@@ -100,22 +105,22 @@
 	<div class="center">
 		<h1>Raphael Charts plugin</h1>
 		
-		<h2>3D pie demo</h2>		
+		<h2>Pie demos</h2>		
 		<div id="canvas" class="canvas">Normal</div>						
-		
 		<div id="canvas2" class="canvas">Exploded</div>
 		<div id="canvas3" class="canvas">Interactive</div>
 		<div id="canvas4" class="canvas">Custom colors</div>
 		<div id="canvas5" class="canvas">Custom 3D size</div>
 		<!---->
 		<br clear="all"/>
-		
-		<h2>Bar 3D demo</h2>
+		<br/>
+		<h2>Column / Bar demos</h2>
 		<div id="canvas6" class="canvas">Bar 3d - vertical</div>		
 		<div id="canvas7" class="canvas">Bar 3d - horizontal</div>
+		<div id="canvas8" class="canvas">Bar 2d</div>
 		<!-- -->
 	</div>
-	<div id="tooltip"><span class="tooltip">Tooltip</span></div>
+	<span id="tooltip" class="tooltip">Tooltip</span>
 	<div id="debug"></div> 
 </body>
 
