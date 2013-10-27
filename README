@@ -1,9 +1,14 @@
-* Raphael Charts plugin - version 0.11
+* Raphael Charts plugin - version 0.2
 * Copyright (c) 2010 Boris Kuzmic (boris.kuzmic@gmail.com)
 * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
 
 Changes
 -------
+
+version 0.2:
+ - added legends for pie charts
+ - updated to Raphael version 2.1.2
+ - bugfixes for IE (tested IE6-10)
 
 version 0.11: 
  - bug fixes to support Raphael version 2.1.0
@@ -21,9 +26,11 @@ So far:
 - added support for drawing 2d and 3d pie charts
 - added support for drawing 3d horizontal and vertical bar charts
 - works in all major browsers 
+- support for legends (like tooltips - using HTML elements, not SVG)
 
 To be done:
-- support for legends (like tooltips - using HTML elements, not SVG)
+- add legends for bar charts
+- make demo that will show all options in live edit mode
 
 Demo
 ----
