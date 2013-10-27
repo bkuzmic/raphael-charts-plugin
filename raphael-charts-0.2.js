@@ -1,5 +1,5 @@
 /*
- * Raphael Charts plugin - version 0.11
+ * Raphael Charts plugin - version 0.2
  * Copyright (c) 2010 Boris Kuzmic (boris.kuzmic@gmail.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  * 
@@ -8,7 +8,8 @@
 (function() {
 
 	Raphael.fn.pie = function(canvasWidth, canvasHeight, R1, R2, values, options) {
-		var paper = this;	
+		var paper = this;
+    var parentElement = this.canvas.parentElement;	
 		options = options || {};
 		var o = {
 			cx : canvasWidth / 2,
@@ -27,7 +28,11 @@
 			explode : options.explode || false,
 			tooltip : options.tooltip || false,
 			labels : options.labels || [],
-			backgroundFill : options.backgroundFill || [ "#fff", "#fff" ]
+			backgroundFill : options.backgroundFill || [ "#fff", "#fff" ],
+      legendTipLineColor: options.legendTipLineColor || "#000",
+      legendTipCssClass: options.legendTipCssClass || "raphael-charts-legend-tip",
+      legendContainerCssClass: options.legendContainerCssClass || "raphael-charts-legend-container",
+      legendLabelCssClass: options.legendLabelCssClass || "raphael-charts-legend-label"
 		};
 
 		var slices = [];
@@ -41,6 +46,7 @@
 			this.ty = 0;
 			this.txm = 0;
 			this.tym = 0;
+      this.alphaM = 0;
 		};
 
 		function slicePart() {
@@ -79,7 +85,7 @@
 			s.top = e;
 			if (o.show3d) {
 				p = createPathForBorderPart(o.cx - o.R1, o.cy, o.cx + o.R1, o.cy, 0);
-				borderParams = {stroke : "none", gradient : "90-" + o.darkColors[0] + "-" + o.colors[0]};
+				borderParams = {stroke : "none", fill: "90-" + o.darkColors[0] + "-" + o.colors[0]};
 				s.border = createPart(p, borderParams);
 			}					
 			slices[0] = s;
@@ -87,9 +93,9 @@
 			for ( var i = 0; i < o.numberOfValues; i++) {
 				s = new slice();
 				
-				sideParams = {stroke : "none", fill : o.darkColors[i]};
-				borderParams = {stroke : "none", gradient : "90-" + o.darkColors[i] + "-" + o.colors[i]};
-				topParams = {stroke : "#ccc", gradient : "180-" + o.darkColors[i] + "-" + o.lightColors[i]}; //fill : o.colors[i] 
+				sideParams = {stroke: "none", fill: o.darkColors[i]};
+				borderParams = {stroke: "none", fill: "90-" + o.darkColors[i] + "-" + o.colors[i]};
+				topParams = {stroke: "#ccc", fill: "180-" + o.darkColors[i] + "-" + o.lightColors[i]};
 	
 				var endX = x;
 				var endY = y;
@@ -113,6 +119,7 @@
 				s.ty = y4;
 				s.txm = xm;
 				s.tym = ym;
+        s.alphaM = alphaM;
 								
 				if (o.show3d) {
 					topParams.stroke = "none";
@@ -160,16 +167,16 @@
 			}
 			
 			drawSlicePart(sPart, "side1");
-			drawSlicePart(bPart, "border");
+			drawSlicePart(bPart, "border");      
 			drawSlicePart(topPart, "top");
 		}						
 						
-		function drawSlicePart(slicePart, side) {
+		function drawSlicePart(slicePart, side) {      
 			for ( var i = slicePart.paths.length - 1; i >= 0; i--) {													
-				s = slices[slicePart.indexes[i]];
+				s = slices[slicePart.indexes[i]];        
 				if (side == "side1") {
 					s[side] = createPartAndSendToBack(slicePart.paths[i], slicePart.params[i]);
-				} else {
+				} else {          
 					s[side] = createPart(slicePart.paths[i], slicePart.params[i]);
 				}															
 				slices[slicePart.indexes[i]] = s;
@@ -211,7 +218,7 @@
 			return part;
 		}
 		
-		function createPart(path, params) {
+		function createPart(path, params) {      
 			part = paper.path(path);
 			part.attr(params);				
 			return part;
@@ -221,12 +228,12 @@
 		var background = paper.rect(0, 0, canvasWidth, canvasHeight);
 		var backgroundParams = (o.backgroundFill[0] == o.backgroundFill[1]) ?
 				{stroke : "none", fill : o.backgroundFill[0]} : 
-				{stroke : "none", gradient : "90-" + o.backgroundFill[0] + "-" + o.backgroundFill[1]}; 			
+				{stroke : "none", fill : "90-" + o.backgroundFill[0] + "-" + o.backgroundFill[1]}; 			
 		background.attr(backgroundParams);			
 		background.toBack();
 
 		if (o.animation && o.numberOfValues > 1) {
-			for ( var i = 0; i < o.numberOfValues; i++) {
+			for ( var i = 0; i <  o.numberOfValues; i++) { 
 				slices[i].top.num = i;
 				slices[i].top.mouseover(function() {
 					if (o.tooltip)
@@ -247,6 +254,18 @@
 				explodeSlice(slices[i]);
 			}
 		}
+
+    if (!o.explode && !o.animation) {
+      // create legend container elements
+      var legendTipsDiv = document.createElement("div");
+      var legendLabels = document.createElement("ul");
+      legendLabels.className = o.legendContainerCssClass;
+      parentElement.appendChild(legendTipsDiv);
+      parentElement.appendChild(legendLabels);  
+      for (var i = 0; i < o.numberOfValues; i++) {
+        drawLegendLabels(slices[i], i, legendTipsDiv, legendLabels);
+      }
+    }
 
 		function showTooltip(num, show) {
 			var tooltip = document.getElementById('tooltip');
@@ -284,12 +303,12 @@
 		
 		function highlightOn(s) {
 			//s.top.attr("fill", o.lightColors[s.top.num]);
-			s.top.attr("gradient", "90-" + o.lightColors[s.top.num] + "-" + o.colors[s.top.num]);
+			s.top.attr("fill", "90-" + o.lightColors[s.top.num] + "-" + o.colors[s.top.num]);
 		}
 		
 		function highlightOff(s) {
 			//s.top.attr("fill", o.colors[s.top.num]);
-			s.top.attr("gradient", "180-" + o.darkColors[s.top.num] + "-" + o.lightColors[s.top.num]);
+			s.top.attr("fill", "180-" + o.darkColors[s.top.num] + "-" + o.lightColors[s.top.num]);
 		}
 
 		function animateSliceOut(s, speed) {				
@@ -326,6 +345,56 @@
 			(s.s3) ? s.s3.transform("T" + translateX + "," +translateY)  : false;
 			s.top.transform("T" + translateX + "," +translateY);
 		}
+
+    function drawLegendLabels(s, sliceIndex, legendTipsDiv, legendLabels) {
+      var legendTip = document.createElement("div");
+      legendTip.style.position = 'absolute';    
+      legendTip.style.zIndex = 1000;
+      legendTip.className = o.legendTipCssClass;
+      var legendTipText = document.createTextNode(o.labels[sliceIndex]);
+      legendTip.appendChild(legendTipText);
+      legendTipsDiv.appendChild(legendTip);
+
+      var legendLabel = document.createElement("li");
+      legendLabel.className = o.legendLabelCssClass;      
+
+      var legendLabelText = document.createElement("span"); 
+      legendLabelText.appendChild(document.createTextNode(" " + o.labels[sliceIndex]));
+      legendLabel.appendChild(legendLabelText);
+      legendLabels.appendChild(legendLabel);
+
+      var lwh = findWH(legendLabel);  
+      legendLabel.style.display = 'block';
+      lwh.height = lwh.height - 1;   
+      var legendColor = Raphael(legendLabel, lwh.height, lwh.height);
+      legendColor.circle(lwh.height/2, lwh.height/2, lwh.height/2).attr(
+        {stroke: "none", 
+         fill: "180-" + o.darkColors[sliceIndex] + "-" + o.lightColors[sliceIndex]});
+      legendColor.canvas.style.top = '1px';   
+      legendColor.canvas.style.display = 'inline';
+      legendColor.canvas.style.zoom = '1'; 
+      legendColor.canvas.style.overflow = 'visible'; 
+
+
+      var cur = findPos(paper.canvas);      
+      var wh = findWH(legendTip);      
+      var dirx = o.cx - s.txm;      
+      var pw = (dirx < 0) ? -5 : wh.width + 5;            
+        
+      var diry = o.cy - s.tym;
+      var ph = (diry < 0) ? 0 : wh.height + 5;      
+
+      var xLineEnd = o.cx + (o.R1 + 20) * Math.cos(s.alphaM * Math.PI / 180);
+      var yLineEnd = o.cy + (o.R2 + 20) * Math.sin(s.alphaM * Math.PI / 180);
+
+      var legendLine = ["M", s.txm, s.tym, "L", xLineEnd, yLineEnd].join(",");
+      createPart(legendLine, {stroke : o.legendTipLineColor});
+      paper.circle(xLineEnd, yLineEnd, 3).attr({stroke: "none", fill: o.legendTipLineColor});
+
+      legendTip.style.left = Math.round(cur.left + xLineEnd - pw) + "px";
+      legendTip.style.top = Math.round(cur.top + yLineEnd - ph) + "px";
+      legendTip.style.display = 'block';
+    }
 			
 		function calculateLargeArcFlag(value, total) {
 			return (total * value) < 180 ? 0 : 1;
@@ -395,7 +464,7 @@
             frontParams = {
                 stroke: "#000",
                 "stroke-width": 0.5,
-                gradient: grad_angle + "-" + o.darkColors[i] + "-" + o.colors[i]
+                fill: grad_angle + "-" + o.darkColors[i] + "-" + o.colors[i]
             };
             if (o.horizontal) {
                 w = (maxp / o.max) * o.val[i];
@@ -439,11 +508,11 @@
         }
 
         function highlightOn(b) {
-            b.attr("gradient", grad_angle + "-" + o.darkColors[b.num] + "-" + o.lightColors[b.num]);
+            b.attr("fill", grad_angle + "-" + o.darkColors[b.num] + "-" + o.lightColors[b.num]);
         }
 
         function highlightOff(b) {
-            b.attr("gradient", grad_angle + "-" + o.darkColors[b.num] + "-" + o.colors[b.num]);
+            b.attr("fill", grad_angle + "-" + o.darkColors[b.num] + "-" + o.colors[b.num]);
         }
 
         function showTooltip(num, show) {
@@ -474,7 +543,7 @@
         if (o.backgroundFill[0] != o.backgroundFill[1]) {
             attrGrid = {
                 stroke: "none",
-                gradient: "45-" + o.backgroundFill[0] + "-" + o.backgroundFill[1]
+                fill: "45-" + o.backgroundFill[0] + "-" + o.backgroundFill[1]
             };
             p3 = ["M", 0, padding + o.size3d, "L", padding + o.size3d, 0, "L", padding + o.size3d, cy - o.size3d - padding, "L", 0, cy, "z"].join(",");
             var grid1 = paper.path(p3);
