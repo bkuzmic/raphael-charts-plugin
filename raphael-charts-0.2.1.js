@@ -9,7 +9,7 @@
 
 	Raphael.fn.pie = function(canvasWidth, canvasHeight, R1, R2, values, options) {
 		var paper = this;
-    var rootElement = this.canvas.parentElement;	
+    var rootElement = this.canvas.parentNode;	
 		options = options || {};
 		var o = {
 			cx : canvasWidth / 2,
