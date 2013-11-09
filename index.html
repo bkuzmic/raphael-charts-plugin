@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<title>Raphael charts plugin</title>
+
 <style type="text/css" media="screen">
 
 body {
@@ -12,171 +17,131 @@ body {
   width: 80%;
   text-align: center;
   margin: 0 auto;
-}
-     
-.canvas {
-	float: left;
-  height: 300px;
-  margin: 0 10px 25px auto;
-  text-align: center;
-  width: 30%;
+  font-family: Arial, Sans-serif;
 }
 
 #tooltip {
-	position: absolute;
+  position: absolute;
   left: -9999px;
   top: 0;
-  display: none;		    
+  display: none;        
   text-align: center;
-  padding: 2px;	
-  z-index: 1000;    	  
+  padding: 2px; 
+  z-index: 1000;        
 }
 
 .tooltip {
-	font-family: Arial, Sans-serif;    
-	font-size: 12px;	    
-	border: 2px solid #000;	    	   	   
-	border-radius: 4px; 
-	background-color: #fff;	    
+  font-family: Arial, Sans-serif;    
+  font-size: 12px;      
+  border: 2px solid #000;              
+  border-radius: 4px; 
+  background-color: #fff;     
 }
 
-.raphael-charts-legend-tip {
-	font-family: Arial, Sans-serif;    
-  font-size: 12px;	
-  color: #000;	
+.pie-legend-container {
+  width: 410px;
 }
 
-.paper4-legend-tip {
-	font-family: Arial, Sans-serif;    
-  font-size: 12px;	
-  color: #333;	
+.pie-legend-container ul {
+  margin: 0;
+  padding: 2px;
+  border: 1px solid #ccc; 
+  overflow: hidden;
+  zoom: 1;
+  border-radius: 5px;
 }
 
-.raphael-charts-legend-container {
-	margin: 0;
-	padding: 2px;
-	border: 1px solid #aaa;
-	background-color: #eee;	
-	overflow: hidden;
-	zoom: 1;	
-	border-radius: 5px;
-}
-
-.raphael-charts-legend-label {
-	list-style: none;
-	float: left;
-	font-family: Sans-serif;
-	font-size: 14px;
-	margin-right: 15px;
-}
-
-.paper4-legend-container  {
-	margin: 0;
-	padding: 2px;
-	border: 1px solid #ccc;	
-	overflow: hidden;
-	zoom: 1;
-	border-radius: 5px;
-}
-
-.paper4-legend-label {
-	list-style: none;
-	float: left;
-	font-family: Arial, Sans-serif;
-	font-size: 12px;
-	margin-right: 15px;	
-}
-
-#debug {
-	display: none;
-	position: absolute;
-	top: 0;
-	right: 0;
-	width: 300px;
-	border: 1px solid #ccc;
-	background-color: #eee;
+.pie-legend-label {
+  list-style: none;
+  float: left;
+  font-family: Arial, Sans-serif;
+  font-size: 12px;
+  margin-right: 15px; 
 }
 
 </style>
-	
+  
 <script src="raphael-min-2.1.2.js" type="text/javascript"></script>
-<script src="raphael-charts-0.2-min.js" type="text/javascript"></script>
+<script src="raphael-charts-0.2.1-min.js" type="text/javascript"></script>
     
 <script type="text/javascript">
-    window.onload = function() {
-      var canvasX = 320;
-      var canvasY = 300;       
-      
-      var paper = Raphael("canvas", canvasX, canvasY);
-         
-      var startTime = new Date().getTime();   
-      paper.pie(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,10,10,10,10,4], 
-            {animation: true, tooltip: true, show3d: true});
-      var endTime = new Date().getTime();
-      //console.log("Time: " + (endTime - startTime));                  
-
-      var paper2 = Raphael("canvas2", canvasX, canvasY);
-      paper2.pie(canvasX, canvasY, 100, 50, [10,20,30], {explode: true});
-
-      var paper3 = Raphael("canvas3", canvasX, canvasY);  
-      paper3.pie(canvasX, canvasY, 100, 50, [5,5,10,10,5,10,10,45], {animation: true});
-      
-      var paper4 = Raphael("canvas4", canvasX, canvasY);  
-      paper4.pie(canvasX, canvasY, 100, 50, [10,20,30,15], 
-        {colors: ["#c00","#0c0","#cc0", "#00c"], labels: ["First", "Second", "Third", "Forth"],
-        legendContainerCssClass: "paper4-legend-container", 
-        legendTipLineColor: "#AAAAAA", 
-        legendLabelCssClass: "paper4-legend-label",
-        legendTipCssClass: "paper4-legend-tip"});     
-          
-      var paper5 = Raphael("canvas5", 350, canvasY);  
-      paper5.pie(350, canvasY, 120, 60, [20,10,30], 
-            {colors: ["#cc0","#0cc","#369"], size3d: 30, animation: false, tooltip: true, show3d: true,
-             labels: ["Slice 1", "Slice 2", "Slice 3"],
-             legendContainerCssClass: "raphael-charts-legend-container",
-             backgroundFill: ["#ccc", "#333"]});
-
-      var paper6 = Raphael("canvas6", canvasX, canvasY);
-      paper6.bar(canvasX, canvasY, [10,20,50,40,30,15,35,20,20,14], 
-        {tooltip: true, backgroundFill: ["#9bf", "#369"], show3d: true}); 
+  window.onload = function() {
+    var canvasX = 320;
+    var canvasY = 200;              
     
-      var paper7 = Raphael("canvas7", canvasX, canvasY);
-      paper7.bar(250, 150, [10,20,50,40], 
-        {tooltip: true, labels: ["First Value","Second Value","Third Value is a little longer"],
-          backgroundFill: ["#ccc", "#333"], horizontal: true, show3d: true});
+    var paper1 = Raphael("3dPie", canvasX, canvasY);  
+    paper1.pie(
+      canvasX, 
+      canvasY, 
+      100, 
+      50, 
+      [10,20,30,15], 
+      {
+        colors: ["#c00","#0c0","#cc0", "#00c"], 
+        labels: ["First", "Second", "Third", "Forth"],
+        show3d: true,
+        animation: true,
+        legend: true,
+        legendContainerCssClass: "pie-legend-container", 
+        legendLineColor: "#AAAAAA",
+        legendTextColor: "#000",
+        legendFont: "12px Arial",  
+        legendLabelCssClass: "pie-legend-label",
+        legendShowValues: "percentage"
+      }
+    );    
 
-      var paper8 = Raphael("canvas8", canvasX, canvasY);
-      paper8.bar(250, 150, [10,20,50,40],
-                {tooltip: true, labels: ["First Value","Second Value","Third Value is a little longer"],
-                backgroundFill: ["#ccc", "#ccc"], horizontal: true});
+    var paper2 = Raphael("3dBar", canvasX, canvasY);
+    paper2.bar(
+      canvasX, 
+      canvasY, 
+      [10,20,50,40,30,15,35,20,20,14], 
+      {
+        tooltip: true, 
+        backgroundFill: ["#ccc", "#666"], 
+        show3d: true
+      }
+    );  
   };
-  </script>
+</script>
 </head>
 
-<body>	
-	<div class="center">
-		<h1>Raphael Charts Plugin Examples</h1>
-		<h2>See source at: 
-		<a href="http://github.com/bkuzmic/raphael-charts-plugin" title="Github - raphael-charts-plugin">http://github.com/bkuzmic/raphael-charts-plugin</a>
-		</h2>
+<body>
 
-		<h2>Pie demos</h2>    
-    <div id="canvas" class="canvas">Interactive 3D with tooltip</div>           
-    <div id="canvas2" class="canvas">Exploded 2D</div>
-    <div id="canvas3" class="canvas">Interactive 2D</div>
-    <div id="canvas4" class="canvas">With modified legend - using CSS</div>
-    <div id="canvas5" class="canvas" style="width: 350px">Custom 3D size and colors</div>
-    <!---->
-    <br clear="all"/>
-    <br/>
-    <h2>Column / Bar demos</h2>
-    <div id="canvas6" class="canvas"><p>Bar 3d - vertical</p></div>   
-    <div id="canvas7" class="canvas"><p>Bar 3d - horizontal</p></div>
-    <div id="canvas8" class="canvas"><p>Bar 2d</p></div>
-    <!-- -->
+  <div class="center">
+    <h1>Raphael Charts plugin</h1>
+    
+    <h3>See source at: 
+      <a href="http://github.com/bkuzmic/raphael-charts-plugin" 
+        title="Github - raphael-charts-plugin">http://github.com/bkuzmic/raphael-charts-plugin</a>
+    </h3>
+    
+    <h2>Demos</h2>  
+
+    <div style="text-align: left">
+      <h3>Pie demos</h3>
+      <ul>
+        <li><a title="3D Pie Chart with tooltip" href="http://jsbin.com/enURUhE/1/">3D Pie Chart with tooltip</a></li>
+        <li><a title="2D Exploded Pie Chart" href="http://jsbin.com/aPerIkE/2/">2D Exploded Pie Chart</a></li>
+        <li><a title="2D Interactive Pie Chart" href="http://jsbin.com/UJEPAYOJ/2/">2D Interactive Pie Chart</a></li>
+        <li><a title="2D Pie Chart with legend" href="http://jsbin.com/oHitiLi/1/">2D Pie Chart with legend</a></li>
+      </ul> 
+      <p>Example: 3D Pie Chart with legend</p>
+      <div id="3dPie"></div>
+      <h3>Bar demos</h3>
+      <ul>
+        <li><a title="3D Vertical Bar Chart" href="#">3D Vertical Bar Chart</a></li>
+        <li><a title="3D Horizontal Bar Chart" href="#">3D Horizontal Bar Chart</a></li>
+        <li><a title="2D Bar Chart" href="#">2D Bar Chart</a></li>       
+      </ul> 
+      <p>Example: 3D Vertical Bar Chart</p>
+      <span id="tooltip" class="tooltip">Tooltip</span> 
+      <div id="3dBar"></div>   
+    </div>
+    <p>&nbsp;</p>   
+    
   </div>
-  <span id="tooltip" class="tooltip">Tooltip</span>
-  <div id="debug">Debug print:<br></div> 
+
 </body>
 
 </html>
