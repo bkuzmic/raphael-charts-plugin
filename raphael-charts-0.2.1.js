@@ -1,5 +1,5 @@
 /*
- * Raphael Charts plugin - version 0.2
+ * Raphael Charts plugin - version 0.2.1
  * Copyright (c) 2010 Boris Kuzmic (boris.kuzmic@gmail.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  * 
@@ -9,7 +9,7 @@
 
 	Raphael.fn.pie = function(canvasWidth, canvasHeight, R1, R2, values, options) {
 		var paper = this;
-    var parentElement = this.canvas.parentElement;	
+    var rootElement = this.canvas.parentElement;	
 		options = options || {};
 		var o = {
 			cx : canvasWidth / 2,
@@ -29,10 +29,13 @@
 			tooltip : options.tooltip || false,
 			labels : options.labels || [],
 			backgroundFill : options.backgroundFill || [ "#fff", "#fff" ],
-      legendTipLineColor: options.legendTipLineColor || "#000",
-      legendTipCssClass: options.legendTipCssClass || "raphael-charts-legend-tip",
+      legend: options.legend || false,
+      legendLineColor: options.legendLineColor || "#000",
+      legendTextColor: options.legendTextColor || "#000",
+      legendFont: options.legendFont || "10px Arial",
       legendContainerCssClass: options.legendContainerCssClass || "raphael-charts-legend-container",
-      legendLabelCssClass: options.legendLabelCssClass || "raphael-charts-legend-label"
+      legendLabelCssClass: options.legendLabelCssClass || "raphael-charts-legend-label",
+      legendShowValues: options.legendShowValues || "" // possible values are "normal" and "percentage"
 		};
 
 		var slices = [];
@@ -255,15 +258,15 @@
 			}
 		}
 
-    if (!o.explode && !o.animation) {
+    if (o.legend) {
       // create legend container elements
-      var legendTipsDiv = document.createElement("div");
+      var legendContainerDiv = document.createElement("div");
       var legendLabels = document.createElement("ul");
-      legendLabels.className = o.legendContainerCssClass;
-      parentElement.appendChild(legendTipsDiv);
-      parentElement.appendChild(legendLabels);  
+      legendContainerDiv.className = o.legendContainerCssClass;
+      rootElement.parentNode.insertBefore(legendContainerDiv, rootElement.nextSibling);
+      legendContainerDiv.appendChild(legendLabels);  
       for (var i = 0; i < o.numberOfValues; i++) {
-        drawLegendLabels(slices[i], i, legendTipsDiv, legendLabels);
+        drawLegendLabels(slices[i], i, legendLabels, valSum);
       }
     }
 
@@ -346,20 +349,17 @@
 			s.top.transform("T" + translateX + "," +translateY);
 		}
 
-    function drawLegendLabels(s, sliceIndex, legendTipsDiv, legendLabels) {
-      var legendTip = document.createElement("div");
-      legendTip.style.position = 'absolute';    
-      legendTip.style.zIndex = 1000;
-      legendTip.className = o.legendTipCssClass;
-      var legendTipText = document.createTextNode(o.labels[sliceIndex]);
-      legendTip.appendChild(legendTipText);
-      legendTipsDiv.appendChild(legendTip);
-
+    function drawLegendLabels(s, sliceIndex, legendLabels, valSum) {      
       var legendLabel = document.createElement("li");
       legendLabel.className = o.legendLabelCssClass;      
-
       var legendLabelText = document.createElement("span"); 
-      legendLabelText.appendChild(document.createTextNode(" " + o.labels[sliceIndex]));
+      var legendValue = "";
+      if (o.legendShowValues == "normal") {
+        legendValue = " (" + o.val[i] + ")";
+      } else if (o.legendShowValues == "percentage") {
+        legendValue = " (" + Math.round((o.val[i] / valSum)*100) + "%)";
+      }
+      legendLabelText.appendChild(document.createTextNode(" " + o.labels[sliceIndex] + legendValue));
       legendLabel.appendChild(legendLabelText);
       legendLabels.appendChild(legendLabel);
 
@@ -373,27 +373,30 @@
       legendColor.canvas.style.top = '1px';   
       legendColor.canvas.style.display = 'inline';
       legendColor.canvas.style.zoom = '1'; 
-      legendColor.canvas.style.overflow = 'visible'; 
+      legendColor.canvas.style.overflow = 'visible';           
 
+      // only draw legend lines and text if pie is not exploded or animated
+      if (!o.explode && !o.animation) {
+        var xLineEnd = o.cx + (o.R1 + 20) * Math.cos(s.alphaM * Math.PI / 180);
+        var yLineEnd = o.cy + (o.R2 + 20) * Math.sin(s.alphaM * Math.PI / 180);
 
-      var cur = findPos(paper.canvas);      
-      var wh = findWH(legendTip);      
-      var dirx = o.cx - s.txm;      
-      var pw = (dirx < 0) ? -5 : wh.width + 5;            
+        var legendLine = ["M", s.txm, s.tym, "L", xLineEnd, yLineEnd].join(",");
+        createPart(legendLine, {stroke : o.legendLineColor});
+        paper.circle(xLineEnd, yLineEnd, 3).attr({stroke: "none", fill: o.legendLineColor});
         
-      var diry = o.cy - s.tym;
-      var ph = (diry < 0) ? 0 : wh.height + 5;      
-
-      var xLineEnd = o.cx + (o.R1 + 20) * Math.cos(s.alphaM * Math.PI / 180);
-      var yLineEnd = o.cy + (o.R2 + 20) * Math.sin(s.alphaM * Math.PI / 180);
-
-      var legendLine = ["M", s.txm, s.tym, "L", xLineEnd, yLineEnd].join(",");
-      createPart(legendLine, {stroke : o.legendTipLineColor});
-      paper.circle(xLineEnd, yLineEnd, 3).attr({stroke: "none", fill: o.legendTipLineColor});
-
-      legendTip.style.left = Math.round(cur.left + xLineEnd - pw) + "px";
-      legendTip.style.top = Math.round(cur.top + yLineEnd - ph) + "px";
-      legendTip.style.display = 'block';
+        var legendText = paper.text(Math.round(xLineEnd), Math.round(yLineEnd), o.labels[sliceIndex]);
+        legendText.attr("fill", o.legendTextColor);
+        legendText.attr("font", o.legendFont); 
+        // calculate offset of text based on pie center and line start
+        var legendTextBox = legendText.getBBox();         
+        var dirx = o.cx - s.txm;      
+        var pw = (dirx >= 0) ? 5 : - (legendTextBox.width + 5);                  
+        var diry = o.cy - s.tym;      
+        var ph = (diry >= 0) ? 0 : -legendTextBox.height;
+        // move textbox to fit line position     
+        legendText.attr("x", legendTextBox.x - pw);
+        legendText.attr("y", legendTextBox.y - ph);
+      }  
     }
 			
 		function calculateLargeArcFlag(value, total) {

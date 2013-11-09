@@ -1,9 +1,14 @@
-* Raphael Charts plugin - version 0.2
+* Raphael Charts plugin - version 0.2.1
 * Copyright (c) 2010 Boris Kuzmic (boris.kuzmic@gmail.com)
 * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
 
 Changes
 -------
+
+version 0.2.1:
+ - fixed issue #1 - legend for pie chart
+ - added feature to show values or percentages in legend
+ - updated demos - added links to JSBin
 
 version 0.2:
  - added legends for pie charts
@@ -24,13 +29,13 @@ Info
 
 So far:
 - added support for drawing 2d and 3d pie charts
-- added support for drawing 3d horizontal and vertical bar charts
+- added support for drawing 2d and 3d horizontal and vertical bar charts
 - works in all major browsers 
 - support for legends (like tooltips - using HTML elements, not SVG)
+- demos created on JSBin.com - support live editing
 
 To be done:
 - add legends for bar charts
-- make demo that will show all options in live edit mode
 
 Demo
 ----
