@@ -60,50 +60,7 @@ body {
 }
 
 </style>
-  
-<script src="raphael-min-2.1.2.js" type="text/javascript"></script>
-<script src="raphael-charts-0.2.1-min.js" type="text/javascript"></script>
-    
-<script type="text/javascript">
-  window.onload = function() {
-    var canvasX = 320;
-    var canvasY = 200;              
-    
-    var paper1 = Raphael("3dPie", canvasX, canvasY);  
-    paper1.pie(
-      canvasX, 
-      canvasY, 
-      100, 
-      50, 
-      [10,20,30,15], 
-      {
-        colors: ["#c00","#0c0","#cc0", "#00c"], 
-        labels: ["First", "Second", "Third", "Forth"],
-        show3d: true,
-        animation: true,
-        legend: true,
-        legendContainerCssClass: "pie-legend-container", 
-        legendLineColor: "#AAAAAA",
-        legendTextColor: "#000",
-        legendFont: "12px Arial",  
-        legendLabelCssClass: "pie-legend-label",
-        legendShowValues: "percentage"
-      }
-    );    
 
-    var paper2 = Raphael("3dBar", canvasX, canvasY);
-    paper2.bar(
-      canvasX, 
-      canvasY, 
-      [10,20,50,40,30,15,35,20,20,14], 
-      {
-        tooltip: true, 
-        backgroundFill: ["#ccc", "#666"], 
-        show3d: true
-      }
-    );  
-  };
-</script>
 </head>
 
 <body>
@@ -141,6 +98,50 @@ body {
     <p>&nbsp;</p>   
     
   </div>
+
+  <script src="raphael-min-2.1.2.js" type="text/javascript"></script>
+  <script src="raphael-charts-0.2.1-min.js" type="text/javascript"></script>
+    
+  <script type="text/javascript">
+    window.onload = function() {
+      var canvasX = 320;
+      var canvasY = 200;              
+      
+      var paper1 = Raphael("3dPie", canvasX, canvasY);  
+      paper1.pie(
+        canvasX, 
+        canvasY, 
+        100, 
+        50, 
+        [10,20,30,15], 
+        {
+          colors: ["#c00","#0c0","#cc0", "#00c"], 
+          labels: ["First", "Second", "Third", "Forth"],
+          show3d: true,
+          animation: true,
+          legend: true,
+          legendContainerCssClass: "pie-legend-container", 
+          legendLineColor: "#AAAAAA",
+          legendTextColor: "#000",
+          legendFont: "12px Arial",  
+          legendLabelCssClass: "pie-legend-label",
+          legendShowValues: "percentage"
+        }
+      );    
+
+      var paper2 = Raphael("3dBar", canvasX, canvasY);
+      paper2.bar(
+        canvasX, 
+        canvasY, 
+        [10,20,50,40,30,15,35,20,20,14], 
+        {
+          tooltip: true, 
+          backgroundFill: ["#ccc", "#666"], 
+          show3d: true
+        }
+      );  
+    };
+  </script>
 
 </body>
 
